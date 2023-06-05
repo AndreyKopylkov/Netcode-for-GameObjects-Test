@@ -10,6 +10,7 @@ public class PlayerController : NetworkBehaviour
     
     private Camera _camera;
     private Vector3 _mouseInput;
+    private Vector3 mouseWorldCoordinates;
 
     public override void OnNetworkSpawn()
     {
@@ -32,8 +33,11 @@ public class PlayerController : NetworkBehaviour
             return;
         
         GetInput();
-        Movement();
-        Rotation();
+        if (mouseWorldCoordinates != transform.position)
+        {
+            Movement();
+            Rotation();
+        }
     }
 
     private void GetInput()
@@ -41,24 +45,21 @@ public class PlayerController : NetworkBehaviour
         _mouseInput.x = Input.mousePosition.x;
         _mouseInput.y = Input.mousePosition.y;
         _mouseInput.z = _camera.nearClipPlane;
+        mouseWorldCoordinates = _camera.ScreenToWorldPoint(_mouseInput);
     }
 
     private void Movement()
     {
-        Vector3 mouseWorldCoordinates = _camera.ScreenToWorldPoint(_mouseInput);
+        mouseWorldCoordinates.z = 0f;
         transform.position = Vector3.MoveTowards(transform.position, mouseWorldCoordinates,
             _speed * Time.deltaTime);
     }
 
     private void Rotation()
     {
-        Vector3 mouseWorldCoordinates = _camera.ScreenToWorldPoint(_mouseInput);
-        if(mouseWorldCoordinates != transform.position)
-        {
-            Vector3 targetDirection;
-            targetDirection = mouseWorldCoordinates - transform.position;
-            targetDirection.z = 0;
-            transform.up = targetDirection;
-        }
+        mouseWorldCoordinates = _camera.ScreenToWorldPoint(_mouseInput);
+        Vector3 targetDirection = mouseWorldCoordinates - transform.position;
+        targetDirection.z = 0;
+        transform.up = targetDirection;
     }
 }
