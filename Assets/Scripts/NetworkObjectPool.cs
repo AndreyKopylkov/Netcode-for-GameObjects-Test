@@ -22,6 +22,7 @@ public class NetworkObjectPool : NetworkBehaviour
     HashSet<GameObject> m_Prefabs = new HashSet<GameObject>();
 
     Dictionary<GameObject, ObjectPool<NetworkObject>> m_PooledObjects = new Dictionary<GameObject, ObjectPool<NetworkObject>>();
+    Dictionary<GameObject, int> _nonPooledObjects = new Dictionary<GameObject, int>();
 
     public void Awake()
     {
@@ -40,7 +41,9 @@ public class NetworkObjectPool : NetworkBehaviour
         // Registers all objects in PooledPrefabsList to the cache.
         foreach (var configObject in PooledPrefabsList)
         {
+            _nonPooledObjects[configObject.Prefab] = 0;
             RegisterPrefabInternal(configObject.Prefab, configObject.PrewarmCount);
+            _nonPooledObjects[configObject.Prefab] = 0;
         }
     }
 
@@ -90,6 +93,8 @@ public class NetworkObjectPool : NetworkBehaviour
         noTransform.position = position;
         noTransform.rotation = rotation;
 
+        _nonPooledObjects[prefab]++;
+
         return networkObject;
     }
 
@@ -99,6 +104,7 @@ public class NetworkObjectPool : NetworkBehaviour
     public void ReturnNetworkObject(NetworkObject networkObject, GameObject prefab)
     {
         m_PooledObjects[prefab].Release(networkObject);
+        _nonPooledObjects[prefab]--;
     }
 
     /// <summary>
@@ -144,6 +150,11 @@ public class NetworkObjectPool : NetworkBehaviour
 
         // Register Netcode Spawn handlers
         NetworkManager.Singleton.PrefabHandler.AddHandler(prefab, new PooledPrefabInstanceHandler(prefab, this));
+    }
+
+    public int GetCurrentPrefabCount(GameObject prefab)
+    {
+        return _nonPooledObjects[prefab];
     }
 }
 
