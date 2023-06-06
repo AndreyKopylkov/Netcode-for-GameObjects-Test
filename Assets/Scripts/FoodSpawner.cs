@@ -44,9 +44,10 @@ public class FoodSpawner : NetworkBehaviour
         NetworkObject obj = NetworkObjectPool.Singleton.GetNetworkObject(_prefab, GetRandomPositionOnMap(),
             Quaternion.identity);
         obj.GetComponent<Food>().Prefab = _prefab;
-        // obj.gameObject.SetActive(true);
+        
         //Чтобы дважды не передавать объект с сервера на клиент
-        if(!obj.IsSpawned) obj.Spawn(true);
+        // if(!obj.IsSpawned)
+        obj.Spawn(true);
     }
 
     private Vector3 GetRandomPositionOnMap()

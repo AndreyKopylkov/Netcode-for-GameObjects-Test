@@ -17,7 +17,7 @@ public class PlayerLenght : NetworkBehaviour
     private List<Tail> _tails;
     private Transform _lastTail;
     private Collider2D _collider2D;
-    
+
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -65,7 +65,6 @@ public class PlayerLenght : NetworkBehaviour
     
     private void LengthChangedEvent(ushort previousValue, ushort newValue)
     {
-        Debug.Log("LengthChanged Callback");
         LengthChanged();
     }
 
