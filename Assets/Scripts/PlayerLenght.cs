@@ -55,9 +55,12 @@ public class PlayerLenght : NetworkBehaviour
     private void LengthChanged()
     {
         InstantiateTail();
-        
-        if(IsOwner)
+
+        if (IsOwner)
+        {
             ChangedLenghtEvent?.Invoke(Lenght.Value);
+            ClientMusicPlayer.Instance.PlayerEatAudioClip();
+        }
     }
     
     private void LengthChangedEvent(ushort previousValue, ushort newValue)

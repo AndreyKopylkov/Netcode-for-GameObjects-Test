@@ -10,7 +10,7 @@ public class ClientMusicPlayer : Singleton<ClientMusicPlayer>
     public override void Awake()
     {
         base.Awake();
-        _audioSource.GetComponent<AudioSource>();
+        _audioSource = GetComponent<AudioSource>();
     }
 
     public void PlayerEatAudioClip()
