@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -7,9 +8,11 @@ public class PlayerLenght : NetworkBehaviour
 {
     [SerializeField] private Tail _tailPrefab;
     
-    public NetworkVariable<ushort> Lenght = new(1,
+    public NetworkVariable<ushort> Lenght = new(0,
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server);
+
+    [CanBeNull] public static event System.Action<ushort> ChangedLenghtEvent;
 
     private List<Tail> _tails;
     private Transform _lastTail;
@@ -22,25 +25,52 @@ public class PlayerLenght : NetworkBehaviour
         _tails = new List<Tail>();
         _lastTail = transform;
         _collider2D = GetComponent<Collider2D>();
-        if(!IsServer) 
-            Lenght.OnValueChanged += LengthChanged;
+        if(!IsServer)
+            Lenght.OnValueChanged += LengthChangedEvent;
+
+        SetLenght(1);
     }
-    
+
+    public override void OnNetworkDespawn()
+    {
+        if(!IsServer)
+            Lenght.OnValueChanged -= LengthChangedEvent;
+    }
+
     [ContextMenu("Add Length")]
     public void AddLength()
     {
         Lenght.Value += 1;
-        InstantiateTail();
+        LengthChanged();
     }
 
-    private void LengthChanged(ushort previousValue, ushort newValue)
+    private void SetLenght(ushort newValue)
+    {
+        Lenght.Value = newValue;
+
+        if(IsOwner)
+            ChangedLenghtEvent?.Invoke(Lenght.Value);
+    }
+
+    private void LengthChanged()
+    {
+        InstantiateTail();
+        
+        if(IsOwner)
+            ChangedLenghtEvent?.Invoke(Lenght.Value);
+    }
+    
+    private void LengthChangedEvent(ushort previousValue, ushort newValue)
     {
         Debug.Log("LengthChanged Callback");
-        InstantiateTail();
+        LengthChanged();
     }
 
     private void InstantiateTail()
     {
+        if(Lenght.Value == 1)
+            return;
+        
         Tail newTail = Instantiate(_tailPrefab, transform.position, Quaternion.identity);
         newTail.SpriteRenderer.sortingOrder = -Lenght.Value;
         newTail.NetworkedOwner = transform;
