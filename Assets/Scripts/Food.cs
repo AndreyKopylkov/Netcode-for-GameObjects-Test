@@ -29,7 +29,7 @@ public class Food : NetworkBehaviour
         if(!NetworkManager.Singleton.IsServer)
             return;
 
-        if (other.TryGetComponent(out PlayerLenght playerLenght))
+        if (other.TryGetComponent(out PlayerLength playerLenght))
         {
             playerLenght.AddLength();   
         }
@@ -40,8 +40,8 @@ public class Food : NetworkBehaviour
         
         _collider.enabled = false;
         _isEaten = true;
-        NetworkObjectPool.Singleton.ReturnNetworkObject(NetworkObject, Prefab);
-        // if(IsSpawned)
-        //     NetworkObject.Despawn();
+        // NetworkObjectPool.Singleton.ReturnNetworkObject(NetworkObject, Prefab);
+        if(IsSpawned)
+            NetworkObject.Despawn();
     }
 }

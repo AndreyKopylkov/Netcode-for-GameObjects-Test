@@ -8,7 +8,7 @@ using UnityEngine;
 public class PlayerController : NetworkBehaviour
 {
     [SerializeField] private float _speed = 5;
-    [SerializeField] private PlayerLenght _playerLength;
+    [SerializeField] private PlayerLength _playerLength;
 
     private Camera _camera;
     private Vector3 _mouseInput;
@@ -48,23 +48,21 @@ public class PlayerController : NetworkBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("Collision");
-
         if(!other.gameObject.CompareTag("Player"))
             return;
         if(!IsOwner)
             return;
 
-        if (other.gameObject.TryGetComponent(out PlayerLenght targetPlayerLenght))
+        if (other.gameObject.TryGetComponent(out PlayerLength targetPlayerLenght))
         {
             Debug.Log("Head Collision");
 
-            PlayerData player1 = new PlayerData()
+            PlayerData player1 = new PlayerData
             {
                 Id = OwnerClientId,
                 Length = _playerLength.Length.Value
             };
-            PlayerData player2 = new PlayerData()
+            PlayerData player2 = new PlayerData
             {
                 Id = targetPlayerLenght.OwnerClientId,
                 Length = targetPlayerLenght.Length.Value

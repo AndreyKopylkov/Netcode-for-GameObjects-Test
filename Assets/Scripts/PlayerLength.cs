@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerLenght : NetworkBehaviour
+public class PlayerLength : NetworkBehaviour
 {
     [SerializeField] private Tail _tailPrefab;
     
@@ -35,8 +35,22 @@ public class PlayerLenght : NetworkBehaviour
 
     public override void OnNetworkDespawn()
     {
+        base.OnNetworkDespawn();
+        
+        DestroyTails();
+
         if(!IsServer)
             Length.OnValueChanged -= LengthChangedEvent;
+    }
+
+    private void DestroyTails()
+    {
+        while (_tails.Count != 0)
+        {
+            Tail tail = _tails[0];
+            _tails.RemoveAt(0);
+            Destroy(tail.gameObject);
+        }
     }
 
     private void SpawnTailForOtherPlayersInSessionOnStart()
