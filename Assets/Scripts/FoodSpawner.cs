@@ -20,7 +20,7 @@ public class FoodSpawner : NetworkBehaviour
     private void SpawnFoodStart()
     {
         NetworkManager.Singleton.OnServerStarted -= SpawnFoodStart;
-        NetworkObjectPool.Singleton.RegisterPrefabInternal(_prefab, _startFoodCount);
+        NetworkObjectPool.Singleton.RegisterPrefabInternal(_prefab, _maxFoodOnScene);
         for (int i = 0; i < _startFoodCount; i++)
         {
             SpawnFood();
@@ -46,8 +46,8 @@ public class FoodSpawner : NetworkBehaviour
         obj.GetComponent<Food>().Prefab = _prefab;
         
         //Чтобы дважды не передавать объект с сервера на клиент
-        // if(!obj.IsSpawned)
-        obj.Spawn(true);
+        if(!obj.IsSpawned)
+            obj.Spawn(true);    
     }
 
     private Vector3 GetRandomPositionOnMap()

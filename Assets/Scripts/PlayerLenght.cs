@@ -8,11 +8,11 @@ public class PlayerLenght : NetworkBehaviour
 {
     [SerializeField] private Tail _tailPrefab;
     
-    public NetworkVariable<ushort> Lenght = new(0,
+    public NetworkVariable<ushort> Length = new(0,
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server);
 
-    [CanBeNull] public static event System.Action<ushort> ChangedLenghtEvent;
+    [CanBeNull] public static event System.Action<ushort> ChangedLengthEvent;
 
     private List<Tail> _tails;
     private Transform _lastTail;
@@ -26,7 +26,9 @@ public class PlayerLenght : NetworkBehaviour
         _lastTail = transform;
         _collider2D = GetComponent<Collider2D>();
         if(!IsServer)
-            Lenght.OnValueChanged += LengthChangedEvent;
+            Length.OnValueChanged += LengthChangedEvent;
+        
+        SpawnTailForOtherPlayersInSessionOnStart();
 
         SetLenght(1);
     }
@@ -34,22 +36,29 @@ public class PlayerLenght : NetworkBehaviour
     public override void OnNetworkDespawn()
     {
         if(!IsServer)
-            Lenght.OnValueChanged -= LengthChangedEvent;
+            Length.OnValueChanged -= LengthChangedEvent;
+    }
+
+    private void SpawnTailForOtherPlayersInSessionOnStart()
+    {
+        if (IsOwner) return;
+        for (int i = 0; i < Length.Value - 1; ++i)
+            InstantiateTail();
     }
 
     [ContextMenu("Add Length")]
     public void AddLength()
     {
-        Lenght.Value += 1;
+        Length.Value += 1;
         LengthChanged();
     }
 
     private void SetLenght(ushort newValue)
     {
-        Lenght.Value = newValue;
+        Length.Value = newValue;
 
         if(IsOwner)
-            ChangedLenghtEvent?.Invoke(Lenght.Value);
+            ChangedLengthEvent?.Invoke(Length.Value);
     }
 
     private void LengthChanged()
@@ -58,7 +67,7 @@ public class PlayerLenght : NetworkBehaviour
 
         if (IsOwner)
         {
-            ChangedLenghtEvent?.Invoke(Lenght.Value);
+            ChangedLengthEvent?.Invoke(Length.Value);
             ClientMusicPlayer.Instance.PlayerEatAudioClip();
         }
     }
@@ -70,11 +79,11 @@ public class PlayerLenght : NetworkBehaviour
 
     private void InstantiateTail()
     {
-        if(Lenght.Value == 1)
+        if(Length.Value == 1)
             return;
         
         Tail newTail = Instantiate(_tailPrefab, transform.position, Quaternion.identity);
-        newTail.SpriteRenderer.sortingOrder = -Lenght.Value;
+        newTail.SpriteRenderer.sortingOrder = -Length.Value;
         newTail.NetworkedOwner = transform;
         newTail.FollowTransform = _lastTail;
         _lastTail = newTail.transform;

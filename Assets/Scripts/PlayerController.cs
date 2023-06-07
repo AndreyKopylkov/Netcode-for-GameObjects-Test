@@ -62,12 +62,12 @@ public class PlayerController : NetworkBehaviour
             PlayerData player1 = new PlayerData()
             {
                 Id = OwnerClientId,
-                Length = _playerLength.Lenght.Value
+                Length = _playerLength.Length.Value
             };
             PlayerData player2 = new PlayerData()
             {
                 Id = targetPlayerLenght.OwnerClientId,
-                Length = targetPlayerLenght.Lenght.Value
+                Length = targetPlayerLenght.Length.Value
             };
             DetermineCollisionWinnerServerRpc(player1, player2);
         }

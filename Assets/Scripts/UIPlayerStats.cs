@@ -8,15 +8,15 @@ public class UIPlayerStats : MonoBehaviour
 
     private void OnEnable()
     {
-        PlayerLenght.ChangedLenghtEvent += ChangedLenghtText;
+        PlayerLenght.ChangedLengthEvent += ChangedLengthText;
     }
 
     private void OnDisable()
     {
-        PlayerLenght.ChangedLenghtEvent -= ChangedLenghtText;
+        PlayerLenght.ChangedLengthEvent -= ChangedLengthText;
     }
 
-    private void ChangedLenghtText(ushort value)
+    private void ChangedLengthText(ushort value)
     {
         _lenghtTMP.SetText($"Length {value}");
     }
