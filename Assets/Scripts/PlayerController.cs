@@ -13,6 +13,7 @@ public class PlayerController : NetworkBehaviour
     private Camera _camera;
     private Vector3 _mouseInput;
     private Vector3 mouseWorldCoordinates;
+    private bool _isAlive = true;
 
     private readonly ulong[] _targetClients = new ulong[1];
 
@@ -28,6 +29,7 @@ public class PlayerController : NetworkBehaviour
     private void Initialize()
     {
         _camera = Camera.main;
+        _isAlive = true;
     }
 
     private void Update()
@@ -48,6 +50,8 @@ public class PlayerController : NetworkBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if(!_isAlive)
+            return;
         if(!other.gameObject.CompareTag("Player"))
             return;
         if(!IsOwner)
@@ -127,6 +131,7 @@ public class PlayerController : NetworkBehaviour
             return;
         
         Debug.Log("You Lose!");
+        _isAlive = false;
         GameOverEvent?.Invoke();
         NetworkManager.Singleton.Shutdown();
     }
